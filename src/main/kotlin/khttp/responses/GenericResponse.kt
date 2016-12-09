@@ -124,7 +124,7 @@ class GenericResponse internal constructor(override val request: Request) : Resp
             this.receiver()
             this.connect()
         }
-        if (first.request.allowRedirects && connection.responseCode in 301..303) {
+        if (first.request.allowRedirects && isRedirect(connection)) {
             val cookies = connection.cookieJar
             val req = with(first.request) {
                 GenericResponse(
@@ -150,6 +150,10 @@ class GenericResponse internal constructor(override val request: Request) : Resp
             req.init()
         }
         return connection
+    }
+
+    private fun isRedirect(connection: HttpURLConnection): Boolean {
+        return connection.responseCode in 301..303 || connection.responseCode == 307
     }
 
     internal var _history: MutableList<Response> = arrayListOf()
